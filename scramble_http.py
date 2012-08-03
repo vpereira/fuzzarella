@@ -31,17 +31,21 @@ def scramble_host(p):
     req.Host = "{0:s}:{1:d}".format(''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(500)) , random.randint(1024,9000))
   return p
 
-packets = rdpcap('fb.pcap')
 
+if len(sys.argv) <= 1:
+	print "%s <pcap>" % sys.argv[0]
+	exit(1)
+
+packets = rdpcap(sys.argv[1])
+
+print "upcasing host header"
 upcased_packets = [ upcase(pkt) for pkt in packets]
 wrpcap('upcased.pcap',upcased_packets)
 upcased_packets = []
-
+print "scrambling host entry"
 scrambled_host_packets = [ scramble_host(pkt) for pkt in packets]
 wrpcap('scrambled.pcap',scrambled_host_packets)
-
 scrambled_host_packets = []
-
+print "delete host entry"
 deleted_hosts_packets = [ del_host(pkt) for pkt in packets]
 wrpcap('deleted.pcap',deleted_hosts_packets)
-
