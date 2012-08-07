@@ -70,7 +70,9 @@ def insert_null_to_request(p):
     req_array = req.Method.split()
     if len(req_array) > 3:
       raise Exception('Strange Request')
-    req.Method =  "%s %%00%s%%00 %s" %(req_array[0], req_array[1], req_array[2])
+    #transform the PATH in an array
+    path_array = list(req_array[1])
+    req.Method =  "%s %s %s" %(req_array[0], "%00".join(path_array), req_array[2])
   return p
 
 
