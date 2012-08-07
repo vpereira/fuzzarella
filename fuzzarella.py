@@ -78,26 +78,52 @@ def insert_null_to_request(p):
 
  
 def run_mutations(t, pkts):
-
-    def generic_mutation(t, mutation_func):
+    """
+      Generic Mutation Function
+      you must pass the type and mutation_func. Normally they are equal but one
+      is string. There is nothing like the magic ruby "send"?
+    """
+    def generic_mutation(tt, mutation_func):
+      print "generatng %s" % tt
       mutated_packets = [ mutation_func(pkt) for pkt in copy.deepcopy(pkts)]
       write_mangled_packets("%s.pcap" % t, mutated_packets)
-      return  "%s generated!" % t
 
+    if t == "upcase_host":
+      generic_mutation("upcase_host",upcase_host)
+    elif t == "remove_host":
+      generic_mutation("remove_host", remove_host)
+    elif t == "insert_null_to_request":
+      generic_mutation("insert_null_to_request", insert_null_to_request)
+    elif t == "full_width_url_encoding":
+      generic_mutation("full_width_url_encoded",full_width_url_encoded)
+    elif t == "scramble_host":
+      generic_mutation("scramble_host",scramble_host)
+    elif t == "utf8_encoding":
+      generic_mutation("utf8_url_encoded", utf8_url_encoded)
+    else: #ALL
+      generic_mutation("full_width_url_encoded",full_width_url_encoded)     
+      generic_mutation("remove_host", remove_host)
+      generic_mutation("insert_null_to_request", insert_null_to_request)     
+      generic_mutation("utf8_url_encoded", utf8_url_encoded)  
+      generic_mutation("upcase_host",upcase_host)
+      generic_mutation("scramble_host",scramble_host)
+    #TODO if you are able to FIX this ninja-code, please do it
+    #it calls all the functions, it should call just the value from the choosen
+    #key wierd :-/
     #default to upcase_host
-    return {
-        "upcase_host" : generic_mutation("upcase_host", upcase_host),
-        "insert_null_to_request" : generic_mutation("insert_null_to_request", insert_null_to_request),
-        "full_width_url_encoding" : generic_mutation("full_width_url_encoded",full_width_url_encoded),
-        "remove_host": generic_mutation("remove_host",remove_host),
-        "scramble_host": generic_mutation("scramble_host",scramble_host),
-        "utf8_encoding" : generic_mutation("utf8_url_encoded", utf8_url_encoded)
-    }.get(t,"upcase_host")
+    #return {
+    #    "upcase_host" : generic_mutation("upcase_host", upcase_host),
+    #    "insert_null_to_request" : generic_mutation("insert_null_to_request", insert_null_to_request),
+    #    "full_width_url_encoding" : generic_mutation("full_width_url_encoded",full_width_url_encoded),
+    #    "remove_host": generic_mutation("remove_host",remove_host),
+    #    "scramble_host": generic_mutation("scramble_host",scramble_host),
+    #    "utf8_encoding" : generic_mutation("utf8_url_encoded", utf8_url_encoded)
+    #}.get(t,"upcase_host")
 
 
 def write_mangled_packets(mangle_type,pkts):
   wrpcap(mangle_type,pkts)
-  pkts = []
+  del pkts[:]
   
 if __name__ == '__main__':
 
@@ -106,5 +132,5 @@ if __name__ == '__main__':
 	  sys.exit(1)
 
   packets = rdpcap(sys.argv[1])
-  print run_mutations("upcase_host",packets)
+  run_mutations("all",packets)
 
