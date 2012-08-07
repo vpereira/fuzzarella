@@ -58,7 +58,6 @@ def do_utf8_encoding(url):
 def utf8_url_encoded(p):
   if http_request(p):
     req = p[HTTP][HTTPRequest]
-    #print req.Method
     req_array = req.Method.split()
 
     if len(req_array) > 3:
@@ -67,18 +66,31 @@ def utf8_url_encoded(p):
   return p
 
 
+def insert_null_to_request(p):
+  if http_request(p):
+    req = p[HTTP][HTTPRequest]
+    req_array = req.Method.split()
+    if len(req_array) > 3:
+      raise Exception('Strange Request')
+    req.Method =  "%s %%00%s%%00 %s" %(req_array[0], req_array[1], req_array[2])
+  return p
+
+
+ 
 def run_mutations(t, pkts):
 
     def generic_mutation(t, mutation_func):
-      print "running %s" % t
       mutated_packets = [ mutation_func(pkt) for pkt in copy.deepcopy(pkts)]
       write_mangled_packets("%s.pcap" % t, mutated_packets)
+      return  "%s generated!" % t
 
     #default to upcase_host
     return {
         "upcase_host" : generic_mutation("upcase_host", upcase_host),
+        "insert_null_to_request" : generic_mutation("insert_null_to_request", insert_null_to_request),
         "full_width_url_encoding" : generic_mutation("full_width_url_encoded",full_width_url_encoded),
         "remove_host": generic_mutation("remove_host",remove_host),
+        "scramble_host": generic_mutation("scramble_host",scramble_host),
         "utf8_encoding" : generic_mutation("utf8_url_encoded", utf8_url_encoded)
     }.get(t,"upcase_host")
 
@@ -86,7 +98,7 @@ def run_mutations(t, pkts):
 def write_mangled_packets(mangle_type,pkts):
   wrpcap(mangle_type,pkts)
   pkts = []
-
+  
 if __name__ == '__main__':
 
   if len(sys.argv) <= 1:
@@ -94,4 +106,5 @@ if __name__ == '__main__':
 	  sys.exit(1)
 
   packets = rdpcap(sys.argv[1])
-  run_mutations("upcase_host",packets)
+  print run_mutations("upcase_host",packets)
+
