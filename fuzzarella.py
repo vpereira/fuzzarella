@@ -43,14 +43,12 @@ def full_width_url_encoded(p):
 
 #do full width encoding
 def do_url_encode(url):
-  mutated = ''
-  for char in url:
-    #blacklisting chars that shouldnt be encoded
-    if char not in ['?', '/', '&', '\\', '=', '%', '+']:
-      #todo explain magic 0x20
-      char = "%%uFF%02x" % ( ord(char) - 0x20 )
-    mutated += char
-  return mutated
+  def change(c):
+    if c not in ['?', '/', '&', '\\', '=', '%', '+']: 
+      return "%%uFF%02x" % ( ord(c) - 0x20)
+    else: return c
+  mutated = [ change(c) for c in list(url) ]
+  return "".join(mutated)
 
 def do_utf8_encoding(url):
   return urllib2.quote(url.encode("utf8"))
@@ -86,7 +84,7 @@ def run_mutations(t, pkts):
     def generic_mutation(tt, mutation_func):
       print "generatng %s" % tt
       mutated_packets = [ mutation_func(pkt) for pkt in copy.deepcopy(pkts)]
-      write_mangled_packets("%s.pcap" % t, mutated_packets)
+      write_mangled_packets("%s.pcap" % tt, mutated_packets)
 
     if t == "upcase_host":
       generic_mutation("upcase_host",upcase_host)
