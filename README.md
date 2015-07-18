@@ -1,4 +1,7 @@
-Fuzzarella - Fuzzing with pcaps 
+# Fuzzarella - Fuzzing with pcaps 
+
+## Status: Unmaintained
+
 
 The idea is to try to test evasion against applications that are able to read pcap
 
