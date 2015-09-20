@@ -10,8 +10,11 @@ You should get a clean pcap file, write a rule to match it, from this pcap basel
 What are the intentions:
 
 1-) Try to evade IPS/FW/IDS
+
 2-) Try to bypass protocol validation if it exists
+
 3-) Break the application parsing trash 
+
 4-) ... everything while you are eating your Pizza =)
 
 TODO:
